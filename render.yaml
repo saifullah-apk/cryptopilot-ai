@@ -1,0 +1,17 @@
+services:
+  - type: web
+    name: cryptopilot-ai
+    runtime: node
+    plan: free
+    buildCommand: npm ci && npm run build && npm run build:server
+    startCommand: node dist-server/server.mjs
+    healthCheckPath: /api/health
+    envVars:
+      - key: HOST
+        value: 0.0.0.0
+      - key: GEMINI_MODEL
+        value: gemini-3.5-flash
+      - key: GEMINI_API_KEY
+        sync: false
+      - key: PAPER_DB_PATH
+        value: data/paper.db

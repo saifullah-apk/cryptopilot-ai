@@ -1,0 +1,144 @@
+/* ============================================================
+   CryptoPilot AI — design tokens
+   Premium dark trading terminal (dark is the default theme)
+   ============================================================ */
+
+:root {
+  color-scheme: dark;
+
+  --font-sans: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto,
+    "Helvetica Neue", Arial, sans-serif;
+  --font-mono: ui-monospace, "SF Mono", "Cascadia Mono", Menlo, Consolas,
+    "Liberation Mono", monospace;
+
+  /* ---- surfaces ---- */
+  --bg-base: #070a10;
+  --bg-elevated: #0b1017;
+  --surface-1: #0d131c;
+  --surface-2: #111927;
+  --surface-3: #16202f;
+  --surface-hover: #1a2536;
+
+  --border: rgba(148, 163, 184, 0.13);
+  --border-strong: rgba(148, 163, 184, 0.26);
+
+  /* ---- text ---- */
+  --text-1: #e8eef8;
+  --text-2: #94a3b8;
+  --text-3: #64748b;
+
+  /* ---- semantic ---- */
+  --positive: #10b981;
+  --positive-bright: #34d399;
+  --positive-soft: rgba(16, 185, 129, 0.14);
+  --positive-line: rgba(16, 185, 129, 0.45);
+
+  --negative: #ef4444;
+  --negative-bright: #f87171;
+  --negative-soft: rgba(239, 68, 68, 0.14);
+  --negative-line: rgba(239, 68, 68, 0.45);
+
+  --ai-primary: #8b5cf6;
+  --ai-secondary: #3b82f6;
+  --ai-soft: rgba(139, 92, 246, 0.16);
+  --ai-line: rgba(139, 92, 246, 0.45);
+
+  --neutral-soft: rgba(148, 163, 184, 0.12);
+
+  --focus-ring: 0 0 0 3px rgba(52, 211, 153, 0.35);
+
+  /* ---- gradient accents ---- */
+  --grad-ai: linear-gradient(120deg, #8b5cf6 0%, #3b82f6 55%, #22d3ee 100%);
+  --grad-brand: linear-gradient(120deg, #10b981 0%, #22d3ee 100%);
+  --grad-surface: linear-gradient(
+    180deg,
+    rgba(255, 255, 255, 0.04) 0%,
+    rgba(255, 255, 255, 0) 100%
+  );
+
+  /* ---- radii ---- */
+  --radius-xs: 6px;
+  --radius-sm: 9px;
+  --radius-md: 13px;
+  --radius-lg: 18px;
+  --radius-pill: 999px;
+
+  /* ---- spacing scale ---- */
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 20px;
+  --space-6: 24px;
+  --space-7: 32px;
+  --space-8: 40px;
+
+  /* ---- elevation ---- */
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.35);
+  --shadow-md: 0 8px 24px rgba(0, 0, 0, 0.35);
+  --shadow-lg: 0 24px 60px rgba(0, 0, 0, 0.45);
+  --shadow-glow-ai: 0 0 32px rgba(139, 92, 246, 0.22);
+
+  /* ---- motion ---- */
+  --ease: cubic-bezier(0.4, 0, 0.2, 1);
+  --dur-fast: 130ms;
+  --dur: 220ms;
+  --dur-slow: 420ms;
+
+  /* ---- layout ---- */
+  --sidebar-w: 244px;
+  --header-h: 62px;
+}
+
+/* ============================================================
+   Light theme — same semantic tokens, redefined
+   ============================================================ */
+[data-theme="light"] {
+  color-scheme: light;
+
+  --bg-base: #f4f6fb;
+  --bg-elevated: #ffffff;
+  --surface-1: #ffffff;
+  --surface-2: #f7f9fc;
+  --surface-3: #eef2f8;
+  --surface-hover: #e9eef6;
+
+  --border: rgba(15, 23, 42, 0.1);
+  --border-strong: rgba(15, 23, 42, 0.2);
+
+  --text-1: #0b1220;
+  --text-2: #4b5a70;
+  --text-3: #75839a;
+
+  --positive: #059669;
+  --positive-bright: #047857;
+  --positive-soft: rgba(5, 150, 105, 0.12);
+  --positive-line: rgba(5, 150, 105, 0.4);
+
+  --negative: #dc2626;
+  --negative-bright: #b91c1c;
+  --negative-soft: rgba(220, 38, 38, 0.1);
+  --negative-line: rgba(220, 38, 38, 0.4);
+
+  --ai-primary: #7c3aed;
+  --ai-secondary: #2563eb;
+  --ai-soft: rgba(124, 58, 237, 0.1);
+  --ai-line: rgba(124, 58, 237, 0.35);
+
+  --neutral-soft: rgba(15, 23, 42, 0.07);
+
+  --focus-ring: 0 0 0 3px rgba(5, 150, 105, 0.3);
+
+  --grad-ai: linear-gradient(120deg, #7c3aed 0%, #2563eb 55%, #0891b2 100%);
+  --grad-brand: linear-gradient(120deg, #059669 0%, #0891b2 100%);
+  --grad-surface: linear-gradient(
+    180deg,
+    rgba(15, 23, 42, 0.03) 0%,
+    rgba(15, 23, 42, 0) 100%
+  );
+
+  --shadow-sm: 0 1px 2px rgba(15, 23, 42, 0.06);
+  --shadow-md: 0 8px 24px rgba(15, 23, 42, 0.08);
+  --shadow-lg: 0 24px 60px rgba(15, 23, 42, 0.14);
+  --shadow-glow-ai: 0 0 32px rgba(124, 58, 237, 0.16);
+}
