@@ -21,6 +21,58 @@ Upload these to the application root:
 
 Do **not** upload `.env`, `data/`, or `node_modules/`.
 
+## CyberPanel / OpenLiteSpeed (this server)
+
+1. Panel: `https://<server-ip>:8090` → **Websites → Create Website**
+   - Domain: any subdomain whose DNS already points at this server
+   - PHP: **No PHP**; SSL: skip for now (issue later from the panel)
+2. Upload this package (zip) into `/home/<domain>/public_html/` with **File
+   Manager** (upload + extract), then click **Fix Permissions** on the folder.
+3. Create `.env` in the same folder (File Manager → New File):
+
+   ```ini
+   GEMINI_API_KEY=your-key-here
+   GEMINI_MODEL=gemini-3.5-flash
+   PAPER_DB_PATH=data/paper.db
+   ```
+
+   Do **not** set `PORT` — the app server assigns it. Never commit or zip
+   the real `.env`.
+4. Websites → Manage → **vHost Conf** → append (do not delete existing lines):
+
+   ```
+   context / {
+     type                    appserver
+     location                /home/<domain>/public_html
+     binPath                 /usr/bin/node
+     appType                 node
+     startupFile             dist-server/server.mjs
+     maxConns                100
+     initTimeout             60
+
+     accessControl {
+       allow *
+     }
+
+     rewrite {
+     }
+     addDefaultCharset       off
+   }
+   ```
+
+5. Web Terminal: install Node **22.5+** (`node -v` must confirm), e.g.
+   Ubuntu: `curl -fsSL https://deb.nodesource.com/setup_22.x | bash - && apt-get install -y nodejs`;
+   AlmaLinux: `curl -fsSL https://rpm.nodesource.com/setup_22.x | bash - && dnf install -y nodejs`.
+6. Save the vHost conf, then restart LiteSpeed (panel button or
+   `systemctl restart lsws`).
+7. Verify: `http://<domain>/api/health` → `{"ok":true,...}`.
+
+**Fallback** if the appserver context does not start the app: run the bundle
+under pm2 in the terminal (`npm i -g pm2`, `pm2 start dist-server/server.mjs
+--name cryptopilot`, `pm2 save && pm2 startup`), set `PORT=8787` in `.env`,
+and replace the context with an `extprocessor` proxy to `127.0.0.1:8787`.
+Error log: `/usr/local/lsws/logs/error.log`.
+
 ## cPanel / CloudLinux Node.js app
 
 1. cPanel → **Setup Node.js App** → **Create Application**

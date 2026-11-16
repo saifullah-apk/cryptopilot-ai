@@ -11,6 +11,7 @@
  */
 
 import { createServer, type IncomingMessage, type ServerResponse } from 'node:http'
+import { existsSync, readFileSync, chmodSync } from 'node:fs'
 import { readFile, stat } from 'node:fs/promises'
 import { extname, join, normalize, resolve, sep } from 'node:path'
 import { fileURLToPath } from 'node:url'
@@ -35,9 +36,45 @@ import { createBacktestService, BacktestError } from './backtestService.ts'
 import { getDefaultPortfolioService } from './portfolioService.ts'
 import { PortfolioError } from './binanceReadOnly.ts'
 
+/**
+ * Load `../.env` when present so the bundled `dist-server/server.mjs` also
+ * works on hosts that launch Node without `--env-file`. Variables already in
+ * the environment always win, so `npm start`, shell exports, and process
+ * managers behave exactly as before. A missing file is not an error.
+ */
+function loadEnvFile(): void {
+  try {
+    const envPath = fileURLToPath(new URL('../.env', import.meta.url))
+    if (!existsSync(envPath)) return
+    const lines = readFileSync(envPath, 'utf8').split(/\r?\n/)
+    for (const line of lines) {
+      const match = /^\s*(?:export\s+)?([A-Za-z_][A-Za-z0-9_]*)\s*=\s*(.*)$/.exec(line)
+      if (!match) continue
+      let value = match[2].trim()
+      if (
+        value.length >= 2 &&
+        ((value.startsWith('"') && value.endsWith('"')) ||
+          (value.startsWith("'") && value.endsWith("'")))
+      ) {
+        value = value.slice(1, -1)
+      }
+      if (process.env[match[1]] === undefined) process.env[match[1]] = value
+    }
+  } catch {
+    // A missing or unreadable .env must never block startup.
+  }
+}
+loadEnvFile()
+
 const PORT = Number(process.env.PORT ?? 8787)
 /** Local-only by default. Set HOST=0.0.0.0 deliberately to expose on a LAN. */
 const HOST = process.env.HOST?.trim() || 'localhost'
+/**
+ * LiteSpeed/OpenLiteSpeed appserver contexts may hand the app a unix socket
+ * instead of a TCP port. TCP wins when PORT is set; otherwise a socket
+ * provided by the app server is used; otherwise PORT above applies.
+ */
+const SOCKET_PATH = process.env.LSAPI_SOCKET?.trim() || process.env.SOCKET_PATH?.trim() || ''
 /** Only trust X-Forwarded-For when every request passes through a known proxy. */
 const TRUST_PROXY = process.env.TRUST_PROXY === '1'
 const GEMINI_API_KEY = process.env.GEMINI_API_KEY?.trim() || undefined
@@ -853,8 +890,24 @@ const server = createServer((request, response) => {
   void serveStatic(url.pathname, response, request.method === 'HEAD')
 })
 
-server.listen(PORT, HOST, () => {
-  console.log(`CryptoPilot server listening on http://${HOST}:${PORT}`)
+if (SOCKET_PATH) {
+  server.listen(SOCKET_PATH, () => {
+    try {
+      chmodSync(SOCKET_PATH, 0o777)
+    } catch {
+      // Best effort: the app server may already run as the same user.
+    }
+    console.log(`CryptoPilot server listening on unix socket ${SOCKET_PATH}`)
+    finishStartup()
+  })
+} else {
+  server.listen(PORT, HOST, () => {
+    console.log(`CryptoPilot server listening on http://${HOST}:${PORT}`)
+    finishStartup()
+  })
+}
+
+function finishStartup(): void {
   console.log(`Paper database: SQLite at ${resolveDatabasePath()}`)
   if (HOST !== 'localhost' && HOST !== '127.0.0.1' && HOST !== '::1') {
     console.warn(
@@ -866,4 +919,4 @@ server.listen(PORT, HOST, () => {
       ? `Gemini enabled (model: ${GEMINI_MODEL})`
       : 'Gemini key not set — coach will use the rule-based fallback.',
   )
-})
+}
